@@ -187,17 +187,17 @@ patients_data = health
 
 # Function to provide patient data and medication information
 def provide_patient_info(patient_name):
-    # Retrieve patient data
-    patient = patients_data.get(patient_name)
+    # Search for the patient by name in the DataFrame
+    patient = health[health['Name'] == patient_name]
     
     # Check if the patient exists in the database
-    if not patient:
+    if patient.empty:
         print(f"Patient '{patient_name}' not found. Please check the name and try again.")
         return
     
     # Extract patient details
-    condition = patient["Condition"]
-    medication = patient["Prescribed Medication"]
+    condition = patient['Medical Condition'].values[0]
+    medication = patient['Medication'].values[0]
     
     # Retrieve medication information
     med_info = medication_info.get(medication, {})
@@ -205,15 +205,13 @@ def provide_patient_info(patient_name):
     
     # Display patient data and medication information
     print(f"\nPatient Information for {patient_name}:")
-    print(f"Age: {patient['Age']}")
-    print(f"Gender: {patient['Gender']}")
+    print(f"Age: {patient['Age'].values[0]}")
+    print(f"Gender: {patient['Gender'].values[0]}")
     print(f"Condition: {condition}")
     print(f"Prescribed Medication: {medication}")
     print(f"\nMedication Advice for {medication}:")
     print(f"{condition}: {condition_info}")
 
 # Example Usage
-# Replace 'Bobby Jacks0n' with the name of the patient you want to retrieve data for
-patient_name = input("Enter your name: ")
+patient_name = input("Enter the patient's name: ")
 provide_patient_info(patient_name)
-
