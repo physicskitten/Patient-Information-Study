@@ -54,3 +54,43 @@ else:
     plt.pie([male_count, female_count], labels=['Male', 'Female'], autopct='%.2f%%', colors=['blue', 'pink'])
     plt.title('Gender Distribution')
     plt.show()
+
+# Additional analysis of Age distribution
+plt.figure(figsize=(5, 3))
+health['Age'].hist(edgecolor="white", grid=False, color="#FF7F3E")
+plt.title('Histogram of Age')
+plt.xlabel('Age')
+plt.ylabel('Frequency')
+plt.show()
+
+# Plot the distribution of test results
+colors = plt.get_cmap('Pastel1_r').colors
+health["Test Results"].value_counts().plot(
+    kind='pie', 
+    autopct='%1.1f%%', 
+    figsize=(7, 5), 
+    title='Distribution of Test Results', 
+    explode=(0.11, 0, 0), 
+    shadow=True, 
+    colors=colors
+)
+plt.show()
+
+# Display the count of different blood types
+print("Blood Type Counts:\n", health["Blood Type"].value_counts())
+
+# Group by Gender and Blood Type and count the occurrences
+print("\nBlood Type Distribution by Gender:\n", health.groupby(["Gender"])["Blood Type"].value_counts())
+
+# Group by Medical Condition and Gender and display the percentage distribution
+gender_condition_distribution = health.groupby(["Medical Condition"])["Gender"].value_counts(normalize=True) * 100
+print("\nGender Distribution by Medical Condition (%):\n", gender_condition_distribution)
+
+# Grouping by Gender, Medical Condition, and Blood Type
+grouped_df = health.groupby(["Gender", "Medical Condition", "Blood Type"]).count()["Age"]
+sorted_df = grouped_df.unstack().sort_values(by=["Medical Condition"], ascending=True)
+print("\nSorted Distribution of Conditions by Gender and Blood Type:\n", sorted_df)
+
+# Medication count analysis
+medication_counts = health['Medication'].value_counts()
+print("\nMedication Counts:\n", medication_counts)
