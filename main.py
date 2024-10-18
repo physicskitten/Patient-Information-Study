@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import tkinter as tk
+from tkinter import ttk
 
 # Load the healthcare dataset
 health = pd.read_csv('/kaggle/input/healthcare-dataset/healthcare_dataset.csv')
@@ -16,6 +18,101 @@ print(f"Number of duplicated rows: {duplicate_count}")
 
 # Display basic statistical descriptions of the dataset
 print(health.describe())
+
+# Define a dictionary to hold medication information (already provided in your code)
+medication_info = {
+    "Aspirin": {
+        "Arthritis": "Used to manage pain and inflammation.",
+        "Cancer": "May lower the risk of certain cancers (e.g., colorectal cancer) due to its anti-inflammatory effects.",
+        "Diabetes": "Often prescribed to prevent cardiovascular complications.",
+        "Obesity": "No direct link, but used to manage related pain or inflammation.",
+        "Asthma": "Not typically recommended; can worsen asthma in sensitive individuals.",
+        "Hypertension": "Used with caution as it can affect blood pressure.",
+    },
+    "Ibuprofen": {
+        "Arthritis": "Commonly used to manage arthritis symptoms due to its anti-inflammatory properties.",
+        "Cancer": "No direct evidence linking it to cancer risk, but may have some indirect benefits.",
+        "Diabetes": "Generally safe but should be used cautiously in people with kidney issues.",
+        "Obesity": "No direct link; used for managing related pain.",
+        "Asthma": "Can sometimes worsen asthma symptoms.",
+        "Hypertension": "Should be used cautiously as it can increase blood pressure.",
+    },
+    # Add the rest of the medications...
+}
+
+# Function to provide medication information based on selection
+def get_medication_info(medication, condition):
+    # Retrieve the medication info from the dictionary
+    med_info = medication_info.get(medication, {})
+    # Retrieve the condition-specific information
+    condition_info = med_info.get(condition, "No specific information available for this condition.")
+    return condition_info
+
+# Create a Tkinter GUI
+def create_gui():
+    # Initialize the main window
+    root = tk.Tk()
+    root.title("Healthcare System - Patient Information")
+    root.geometry("500x400")
+
+    # Dropdown for patient name selection
+    tk.Label(root, text="Select Patient Name:").pack(pady=10)
+    patient_names = health['Name'].unique()  # Extract unique patient names
+    patient_name_var = tk.StringVar()
+    patient_dropdown = ttk.Combobox(root, textvariable=patient_name_var, values=patient_names)
+    patient_dropdown.pack()
+
+    # Dropdown for medication selection
+    tk.Label(root, text="Select Medication:").pack(pady=10)
+    medication_var = tk.StringVar()
+    medication_dropdown = ttk.Combobox(root, textvariable=medication_var, values=list(medication_info.keys()))
+    medication_dropdown.pack()
+
+    # Dropdown for condition selection
+    tk.Label(root, text="Select Condition:").pack(pady=10)
+    condition_var = tk.StringVar()
+    condition_dropdown = ttk.Combobox(root, textvariable=condition_var, values=["Arthritis", "Cancer", "Diabetes", "Obesity", "Asthma", "Hypertension"])
+    condition_dropdown.pack()
+
+    # Text area to display patient and medication info
+    result_text = tk.Text(root, height=10, width=50)
+    result_text.pack(pady=20)
+
+    # Function to display patient information based on dropdown selections
+    def display_info():
+        patient_name = patient_name_var.get()
+        medication = medication_var.get()
+        condition = condition_var.get()
+
+        # Check if patient exists
+        patient = health[health['Name'] == patient_name]
+        if patient.empty:
+            result_text.delete(1.0, tk.END)
+            result_text.insert(tk.END, f"Patient '{patient_name}' not found.")
+        else:
+            age = patient['Age'].values[0]
+            gender = patient['Gender'].values[0]
+            condition_info = get_medication_info(medication, condition)
+
+            # Display the patient and medication information
+            result_text.delete(1.0, tk.END)
+            result_text.insert(tk.END, f"Patient Name: {patient_name}\n")
+            result_text.insert(tk.END, f"Age: {age}\n")
+            result_text.insert(tk.END, f"Gender: {gender}\n")
+            result_text.insert(tk.END, f"Condition: {condition}\n")
+            result_text.insert(tk.END, f"Medication: {medication}\n")
+            result_text.insert(tk.END, f"\nMedication Advice:\n{condition_info}")
+
+    # Button to trigger information display
+    tk.Button(root, text="Show Information", command=display_info).pack(pady=10)
+
+    # Run the GUI loop
+    root.mainloop()
+
+# Run the GUI
+create_gui()
+
+# Plotting and Data Visualization
 
 # Plotting the distribution of Age
 plt.figure(figsize=(12, 5))
@@ -118,91 +215,5 @@ print("\nMedication Counts by Admission Type:\n", admission_medication_counts)
 grouped_health = health.groupby(["Admission Type", "Medication", "Medical Condition"]).count()["Age"].unstack()
 print("\nGrouped Data by Admission Type, Medication, and Medical Condition:\n", grouped_health)
 
-# Define a dictionary to hold medication information
-medication_info = {
-    "Aspirin": {
-        "Arthritis": "Used to manage pain and inflammation.",
-        "Cancer": "May lower the risk of certain cancers (e.g., colorectal cancer) due to its anti-inflammatory effects.",
-        "Diabetes": "Often prescribed to prevent cardiovascular complications.",
-        "Obesity": "No direct link, but used to manage related pain or inflammation.",
-        "Asthma": "Not typically recommended; can worsen asthma in sensitive individuals.",
-        "Hypertension": "Used with caution as it can affect blood pressure.",
-    },
-    "Ibuprofen": {
-        "Arthritis": "Commonly used to manage arthritis symptoms due to its anti-inflammatory properties.",
-        "Cancer": "No direct evidence linking it to cancer risk, but may have some indirect benefits.",
-        "Diabetes": "Generally safe but should be used cautiously in people with kidney issues.",
-        "Obesity": "No direct link; used for managing related pain.",
-        "Asthma": "Can sometimes worsen asthma symptoms.",
-        "Hypertension": "Should be used cautiously as it can increase blood pressure.",
-    },
-    "Lipitor (Atorvastatin)": {
-        "Arthritis": "No direct link, but may help manage cardiovascular risk associated with arthritis.",
-        "Cancer": "May have a protective effect against certain cancers, but evidence is inconclusive.",
-        "Diabetes": "Can increase the risk of developing diabetes in some individuals.",
-        "Obesity": "Not directly linked but may be used to manage cholesterol levels.",
-        "Asthma": "No direct link.",
-        "Hypertension": "Used to manage cardiovascular risk factors associated with hypertension.",
-    },
-    "Paracetamol (Acetaminophen)": {
-        "Arthritis": "Used to manage pain, but does not have anti-inflammatory properties.",
-        "Cancer": "No direct link; used for pain management.",
-        "Diabetes": "Generally safe but should be used cautiously in high doses.",
-        "Obesity": "No direct link; used for managing pain related to obesity.",
-        "Asthma": "Safe for most people with asthma.",
-        "Hypertension": "Safe for most people with hypertension.",
-    },
-    "Penicillin": {
-        "Arthritis": "No direct link; used if an infection complicates arthritis.",
-        "Cancer": "No direct link; used to treat infections.",
-        "Diabetes": "Safe to use, but diabetic patients need to monitor for potential side effects.",
-        "Obesity": "No direct link; used for infections.",
-        "Asthma": "Generally safe but can cause allergic reactions in some individuals.",
-        "Hypertension": "Safe for most individuals with hypertension.",
-    },
-}
-
-# Function to provide medication information based on prescription and condition
-def get_medication_info(medication, condition):
-    # Retrieve the medication info from the dictionary
-    med_info = medication_info.get(medication, {})
-    # Retrieve the condition-specific information
-    condition_info = med_info.get(condition, "No specific information available for this condition.")
-    
-    # Display the information to the patient
-    print(f"**Information for {medication}:**")
-    print(f"{condition}: {condition_info}")
-
-# Example Usage
+# Example usage of the medication info function
 get_medication_info("Aspirin", "Arthritis")
-
-# Function to provide patient data and medication information
-def provide_patient_info(patient_name):
-    # Search for the patient by name in the DataFrame
-    patient = health[health['Name'] == patient_name]
-    
-    # Check if the patient exists in the database
-    if patient.empty:
-        print(f"Patient '{patient_name}' not found. Please check the name and try again.")
-        return
-    
-    # Extract patient details
-    condition = patient['Medical Condition'].values[0]
-    medication = patient['Medication'].values[0]
-    
-    # Retrieve medication information
-    med_info = medication_info.get(medication, {})
-    condition_info = med_info.get(condition, "No specific information available for this condition.")
-    
-    # Display patient data and medication information
-    print(f"\nPatient Information for {patient_name}:")
-    print(f"Age: {patient['Age'].values[0]}")
-    print(f"Gender: {patient['Gender'].values[0]}")
-    print(f"Condition: {condition}")
-    print(f"Prescribed Medication: {medication}")
-    print(f"\nMedication Advice for {medication}:")
-    print(f"{condition}: {condition_info}")
-
-# Example Usage
-patient_name = input("Enter the patient's name: ")
-provide_patient_info(patient_name)
