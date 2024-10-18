@@ -6,25 +6,27 @@ import seaborn as sns
 # Load the healthcare dataset
 health = pd.read_csv('/kaggle/input/healthcare-dataset/healthcare_dataset.csv')
 
-# Display the first few rows of the dataset
+# Display the first few rows of the dataset and dataset structure
 print(health.head())
-
-# Display the structure of the dataset
 health.info()
 
 # Check for duplicated rows in the dataset
-print(f"Number of duplicated rows: {health.duplicated().sum()}")
+duplicate_count = health.duplicated().sum()
+print(f"Number of duplicated rows: {duplicate_count}")
 
 # Display basic statistical descriptions of the dataset
 print(health.describe())
 
 # Plotting the distribution of Age
 plt.figure(figsize=(12, 5))
+
+# Histogram
 plt.subplot(1, 2, 1)
 health['Age'].plot(kind='hist', bins=30, color='skyblue', edgecolor='black')
 plt.title('Age Distribution')
 plt.xlabel('Age')
 
+# Kernel Density Estimate (KDE)
 plt.subplot(1, 2, 2)
 health['Age'].plot(kind='kde', color='orange')
 plt.title('Age Density Plot')
@@ -37,21 +39,12 @@ plt.show()
 print(health['Medical Condition'].value_counts())
 
 # Calculate and plot the gender distribution
-male_count = health[health['Gender'] == 'Male'].shape[0]
-female_count = health[health['Gender'] == 'Female'].shape[0]
-
-# Handle missing or incorrect data entries
-if pd.isna(male_count):
-    male_count = 0
-if pd.isna(female_count):
-    female_count = 0
-
-# Plotting the gender distribution pie chart if data is available
-if male_count == 0 and female_count == 0:
-    print("No data available for plotting.")
+gender_counts = health['Gender'].value_counts(dropna=False)
+if gender_counts.isnull().all():
+    print("No data available for gender distribution.")
 else:
     plt.figure(figsize=(6, 6))
-    plt.pie([male_count, female_count], labels=['Male', 'Female'], autopct='%.2f%%', colors=['blue', 'pink'])
+    plt.pie(gender_counts, labels=gender_counts.index, autopct='%.2f%%', colors=['blue', 'pink'])
     plt.title('Gender Distribution')
     plt.show()
 
@@ -80,15 +73,15 @@ plt.show()
 print("Blood Type Counts:\n", health["Blood Type"].value_counts())
 
 # Group by Gender and Blood Type and count the occurrences
-print("\nBlood Type Distribution by Gender:\n", health.groupby(["Gender"])["Blood Type"].value_counts())
+print("\nBlood Type Distribution by Gender:\n", health.groupby("Gender")["Blood Type"].value_counts())
 
 # Group by Medical Condition and Gender and display the percentage distribution
-gender_condition_distribution = health.groupby(["Medical Condition"])["Gender"].value_counts(normalize=True) * 100
+gender_condition_distribution = health.groupby("Medical Condition")["Gender"].value_counts(normalize=True) * 100
 print("\nGender Distribution by Medical Condition (%):\n", gender_condition_distribution)
 
 # Grouping by Gender, Medical Condition, and Blood Type
 grouped_df = health.groupby(["Gender", "Medical Condition", "Blood Type"]).count()["Age"]
-sorted_df = grouped_df.unstack().sort_values(by=["Medical Condition"], ascending=True)
+sorted_df = grouped_df.unstack().sort_values(by="Medical Condition", ascending=True)
 print("\nSorted Distribution of Conditions by Gender and Blood Type:\n", sorted_df)
 
 # Medication count analysis
@@ -96,7 +89,7 @@ medication_counts = health['Medication'].value_counts()
 print("\nMedication Counts:\n", medication_counts)
 
 # Displaying medical condition counts grouped by medication
-medication_condition_counts = health.groupby(['Medication'])["Medical Condition"].value_counts()
+medication_condition_counts = health.groupby('Medication')["Medical Condition"].value_counts()
 print("\nMedical Condition Counts by Medication:\n", medication_condition_counts)
 
 # Plotting the distribution of admission types
@@ -114,11 +107,11 @@ plt.ylabel('')
 plt.show()
 
 # Display the count of admission types grouped by gender
-admission_gender_counts = health.groupby(health["Gender"])["Admission Type"].value_counts().unstack()
+admission_gender_counts = health.groupby("Gender")["Admission Type"].value_counts().unstack()
 print("\nAdmission Type Counts by Gender:\n", admission_gender_counts)
 
 # Grouping admission types by medication
-admission_medication_counts = health.groupby(["Admission Type"])["Medication"].value_counts()
+admission_medication_counts = health.groupby("Admission Type")["Medication"].value_counts()
 print("\nMedication Counts by Admission Type:\n", admission_medication_counts)
 
 # Grouping data by admission type, medication, and medical condition, then counting occurrences
@@ -182,8 +175,6 @@ def get_medication_info(medication, condition):
 
 # Example Usage
 get_medication_info("Aspirin", "Arthritis")
-
-patients_data = health
 
 # Function to provide patient data and medication information
 def provide_patient_info(patient_name):
