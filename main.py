@@ -5,7 +5,7 @@ import seaborn as sns
 import tkinter as tk
 from tkinter import ttk
 
-# Load the healthcare dataset
+# Load the healthcare dataset :)
 health = pd.read_csv('/kaggle/input/healthcare-dataset/healthcare_dataset.csv')
 
 # Display the first few rows of the dataset and dataset structure
@@ -37,7 +37,30 @@ medication_info = {
         "Asthma": "Can sometimes worsen asthma symptoms.",
         "Hypertension": "Should be used cautiously as it can increase blood pressure.",
     },
-    # Add the rest of the medications...
+    "Lipitor (Atorvastatin)": {
+        "Arthritis": "No direct link, but may help manage cardiovascular risk associated with arthritis.",
+        "Cancer": "May have a protective effect against certain cancers, but evidence is inconclusive.",
+        "Diabetes": "Can increase the risk of developing diabetes in some individuals.",
+        "Obesity": "Not directly linked but may be used to manage cholesterol levels.",
+        "Asthma": "No direct link.",
+        "Hypertension": "Used to manage cardiovascular risk factors associated with hypertension.",
+    },
+    "Paracetamol (Acetaminophen)": {
+        "Arthritis": "Used to manage pain, but does not have anti-inflammatory properties.",
+        "Cancer": "No direct link; used for pain management.",
+        "Diabetes": "Generally safe but should be used cautiously in high doses.",
+        "Obesity": "No direct link; used for managing pain related to obesity.",
+        "Asthma": "Safe for most people with asthma.",
+        "Hypertension": "Safe for most people with hypertension.",
+    },
+    "Penicillin": {
+        "Arthritis": "No direct link; used if an infection complicates arthritis.",
+        "Cancer": "No direct link; used to treat infections.",
+        "Diabetes": "Safe to use, but diabetic patients need to monitor for potential side effects.",
+        "Obesity": "No direct link; used for infections.",
+        "Asthma": "Generally safe but can cause allergic reactions in some individuals.",
+        "Hypertension": "Safe for most individuals with hypertension.",
+    },
 }
 
 # Function to provide medication information based on selection
